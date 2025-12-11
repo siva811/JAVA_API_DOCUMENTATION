@@ -1,0 +1,142 @@
+---
+title: Custom domain configuration
+description: Configure and troubleshoot custom domains for your documentation
+---
+
+## Overview
+
+Use custom domains to host your documentation on your own domain (e.g., `docs.yourcompany.com`) instead of the default hosting domain.
+
+## Prerequisites
+
+- Access to your domain's DNS settings
+- A documentation hosting account with custom domain support
+- Domain ownership verification capability
+
+## Configure your custom domain
+
+### Step 1: Add domain to your dashboard
+
+1. Navigate to your documentation dashboard
+2. Go to **Settings** > **Domain**
+3. Enter your custom domain (e.g., `docs.yourcompany.com`)
+4. Click **Add domain**
+
+### Step 2: Configure DNS records
+
+Add a CNAME record in your DNS provider's settings:
+
+| Type | Name | Value |
+|------|------|-------|
+| CNAME | docs | `your-docs-host.com` |
+
+<Note>
+Replace `your-docs-host.com` with the value provided by your documentation hosting platform.
+</Note>
+
+### Step 3: Verify domain
+
+After adding the DNS record:
+
+1. Wait 5-10 minutes for DNS propagation
+2. Click **Verify domain** in your dashboard
+3. Your SSL certificate will be automatically provisioned
+
+<Warning>
+Full DNS propagation can take up to 48 hours. Your domain may not be immediately accessible.
+</Warning>
+
+## Troubleshooting
+
+### Domain revalidation failed
+
+If you see "Failed to revalidate domain" errors, try these solutions:
+
+#### Check DNS configuration
+
+Verify your CNAME record is correctly configured:
+
+```bash
+dig docs.yourcompany.com CNAME
+```
+
+The response should show your hosting provider's domain.
+
+#### Common causes
+
+1. **Incorrect CNAME value** - Double-check the value matches your hosting provider's requirements
+2. **DNS not propagated** - Wait 24-48 hours after making DNS changes
+3. **Conflicting records** - Remove any A records for the same subdomain
+4. **Proxy/CDN interference** - Disable proxy mode in services like Cloudflare during initial setup
+5. **Domain verification expired** - Re-verify domain ownership in your dashboard
+
+#### Verify SSL certificate
+
+Check if SSL certificate provisioning failed:
+
+```bash
+openssl s_client -connect docs.yourcompany.com:443 -servername docs.yourcompany.com
+```
+
+If the certificate is invalid or missing, trigger a new certificate request in your dashboard.
+
+#### Re-validate domain
+
+1. Go to **Settings** > **Domain** in your dashboard
+2. Click **Re-validate** next to your domain
+3. If validation fails, remove and re-add the domain
+4. Ensure DNS records are correct before re-adding
+
+### Domain shows as pending
+
+If your domain status remains "Pending":
+
+- Verify DNS records are correctly configured
+- Check for typos in the CNAME value
+- Ensure you're not using an apex domain (use a subdomain like `docs.yourcompany.com`)
+- Contact your DNS provider to ensure CNAME records are supported
+
+### SSL certificate errors
+
+If you encounter SSL/TLS errors:
+
+1. Clear your browser cache and cookies
+2. Wait for certificate provisioning (can take up to 24 hours)
+3. Verify your domain is correctly pointing to the hosting provider
+4. Check if your DNS provider supports automatic SSL
+
+## Advanced configuration
+
+### Apex domain setup
+
+Some providers don't support CNAME records for apex domains (e.g., `yourcompany.com`). Use one of these alternatives:
+
+- **ALIAS record** - Supported by some DNS providers (Cloudflare, DNSimple)
+- **ANAME record** - Similar to ALIAS, check with your provider
+- **Subdomain** - Use `docs.yourcompany.com` instead (recommended)
+
+### Multiple domains
+
+To configure multiple domains pointing to your documentation:
+
+1. Add each domain separately in your dashboard
+2. Configure DNS records for each domain
+3. Set one domain as the primary (canonical) domain
+4. Other domains will redirect to the primary
+
+## Best practices
+
+- Use a subdomain (`docs.yourcompany.com`) rather than an apex domain
+- Enable HTTPS/SSL for all documentation sites
+- Set up domain monitoring to catch configuration issues early
+- Document your DNS configuration for your team
+- Test domain changes in a staging environment first
+
+## Need help?
+
+If you continue experiencing domain validation issues:
+
+1. Check your hosting provider's status page for outages
+2. Review your DNS provider's documentation for CNAME setup
+3. Contact your hosting provider's support with error details
+4. Provide DNS query results when requesting support
